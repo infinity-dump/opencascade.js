@@ -1,0 +1,46 @@
+name: build-sketchopn-custom
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'builds/sketchopn.custom.yml'
+      - '.github/workflows/sketchopn-custom.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+
+      - name: Pull official ocjs image
+        run: docker pull donalffons/opencascade.js
+
+      - name: Build custom wasm
+        env:
+          YAML_FILE: builds/sketchopn.custom.yml
+        run: |
+          docker run --rm -i \
+            --platform linux/amd64 \
+            -v "$PWD:/src" \
+            -u "$(id -u):$(id -g)" \
+            donalffons/opencascade.js \
+            "$YAML_FILE"
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p dist
+          mv occt.sketchopn.js dist/
+          mv occt.sketchopn.wasm dist/
+          mv occt.sketchopn.d.ts dist/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocjs-sketchopn
+          path: dist/**
+          retention-days: 14
