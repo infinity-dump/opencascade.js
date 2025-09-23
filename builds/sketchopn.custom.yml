@@ -53,6 +53,11 @@ mainBuild:
     - symbol: BRepOffsetAPI_ThruSections
     - symbol: BRepOffset_Mode
     - symbol: BOPAlgo_Options
+    - symbol: BOPAlgo_Algo
+    - symbol: BOPAlgo_Builder
+    - symbol: BOPAlgo_PaveFiller
+    - symbol: BOPAlgo_Operation
+    - symbol: BOPAlgo_GlueEnum
     - symbol: BRep_Tool
     - symbol: BRepTools
     - symbol: BRepAdaptor_Surface
