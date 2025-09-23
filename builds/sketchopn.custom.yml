@@ -137,6 +137,7 @@ mainBuild:
     - symbol: XSControl_Reader
     - symbol: XSControl_WorkSession
     - symbol: IFSelect_WorkSession
+    - symbol: OCJS
   emccFlags:
     - -flto
     - -fexceptions
@@ -153,10 +154,45 @@ mainBuild:
     - --no-entry
     - -sENVIRONMENT='web,worker'
 additionalCppCode: |
+  #include <sstream>
+  #include <BRepAlgoAPI_Algo.hxx>
+  #include <Message_Report.hxx>
+
   typedef Handle(IMeshTools_Context) Handle_IMeshTools_Context;
   class OCJS {
   public:
     static Standard_Failure* getStandard_FailureData(intptr_t exceptionPtr) {
       return reinterpret_cast<Standard_Failure*>(exceptionPtr);
+    }
+
+    static std::string dumpBooleanReport(const BRepAlgoAPI_Algo* algo) {
+      if (algo == nullptr) {
+        return std::string();
+      }
+      const Handle(Message_Report)& report = algo->GetReport();
+      if (report.IsNull()) {
+        return std::string();
+      }
+      std::ostringstream stream;
+      report->Dump(stream);
+      return stream.str();
+    }
+
+    static std::string dumpBooleanErrors(const BRepAlgoAPI_Algo* algo) {
+      if (algo == nullptr) {
+        return std::string();
+      }
+      std::ostringstream stream;
+      algo->DumpErrors(stream);
+      return stream.str();
+    }
+
+    static std::string dumpBooleanWarnings(const BRepAlgoAPI_Algo* algo) {
+      if (algo == nullptr) {
+        return std::string();
+      }
+      std::ostringstream stream;
+      algo->DumpWarnings(stream);
+      return stream.str();
     }
   };
